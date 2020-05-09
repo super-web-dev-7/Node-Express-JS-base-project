@@ -1,38 +1,28 @@
-import express from 'express';
-import * as dotenv from 'dotenv';
-import cors from 'cors';
-import helmet from "helmet";
+import mongoose from 'mongoose';
+import app from './config/express'
+import config from './config/config';
+import mongoOption from './config/mongo';
 
-dotenv.config();
-
-/**
- *
- * App Variable
- */
-
-if (!process.env.PORT) {
+if (!config.port) {
     process.exit(1)
 }
 
-const PORT = parseInt(process.env.PORT, 10) || 7000;
-
-const app = express();
+const PORT = parseInt(config.port, 10) || 7000;
 
 /**
- *
- * App Configuration
+ *Connect with MongoDB
  */
-
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
+mongoose.Promise = Promise;
+const mongoUri = config.mongo.host;
+mongoose.connect(mongoUri, mongoOption);
+mongoose.connection.on('error', () => {
+    throw new Error(`unable to connect to database: ${mongoUri}`);
+});
 
 /**
  *
  * Server Activation
 */
-
-
 
 const server = app.listen(PORT, (err) => {
     if (err) throw err;
